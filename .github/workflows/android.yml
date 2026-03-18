@@ -28,13 +28,10 @@ jobs:
       run: chmod +x gradlew
     
     - name: Build debug APK
-      run: |
-        ./gradlew --version
-        ./gradlew assembleDebug --stacktrace
-        ls -la app/build/outputs/apk/debug/
+      run: ./gradlew assembleDebug
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: travel-tracker-debug
-        path: app/build/outputs/apk/debug/*.apk
+        path: app/build/outputs/apk/debug/
