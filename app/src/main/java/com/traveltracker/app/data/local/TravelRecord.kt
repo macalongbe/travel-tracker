@@ -1,11 +1,9 @@
 package com.traveltracker.app.data.local
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
-@Entity(tableName = "travel_records")
+@Serializable
 data class TravelRecord(
-    @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val country: String,
     val region: String,

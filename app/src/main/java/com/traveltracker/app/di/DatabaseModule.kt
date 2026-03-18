@@ -1,9 +1,7 @@
 package com.traveltracker.app.di
 
 import android.content.Context
-import androidx.room.Room
-import com.traveltracker.app.data.local.TravelDatabase
-import com.traveltracker.app.data.local.TravelRecordDao
+import com.traveltracker.app.data.local.TravelDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,19 +15,9 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideTravelDatabase(
+    fun provideTravelDataStore(
         @ApplicationContext context: Context
-    ): TravelDatabase {
-        return Room.databaseBuilder(
-            context,
-            TravelDatabase::class.java,
-            "travel_database"
-        ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTravelRecordDao(database: TravelDatabase): TravelRecordDao {
-        return database.travelRecordDao()
+    ): TravelDataStore {
+        return TravelDataStore(context)
     }
 }
