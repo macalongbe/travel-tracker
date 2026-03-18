@@ -13,7 +13,13 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// Extension property for DataStore
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "travel_records")
+
+/**
+ * DataStore-based local storage for travel records.
+ * Replaces Room database to avoid KSP compilation issues.
+ */
 
 @Singleton
 class TravelDataStore @Inject constructor(
