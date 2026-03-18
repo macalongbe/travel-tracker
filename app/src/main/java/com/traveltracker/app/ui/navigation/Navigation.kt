@@ -15,14 +15,16 @@ import com.traveltracker.app.ui.viewmodel.TravelViewModel
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
-    object Add : Screen("add?recordId={recordId}")
+    object Add : Screen("add")
     object Stats : Screen("stats")
     
-    fun createRoute(recordId: Long? = null): String {
-        return if (recordId != null) {
-            "add?recordId=$recordId"
-        } else {
-            "add"
+    companion object {
+        fun createRoute(recordId: Long? = null): String {
+            return if (recordId != null) {
+                "add?recordId=$recordId"
+            } else {
+                "add"
+            }
         }
     }
 }

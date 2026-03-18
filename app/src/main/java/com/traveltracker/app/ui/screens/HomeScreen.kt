@@ -28,6 +28,8 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+    
+    val onEditRecord: (Long) -> Unit = onNavigateToEdit
 
     Scaffold(
         topBar = {
