@@ -76,9 +76,11 @@ class TravelViewModel @Inject constructor(
             val stats = mutableMapOf<String, Int>()
             
             records.forEach { record ->
-                val days = ((record.exitDate - record.entryDate) / (1000 * 60 * 60 * 24)).toInt() + 1
-                val key = "${record.country} - ${record.region}"
-                stats[key] = (stats[key] ?: 0) + days
+                val days = ((record.exitDate - record.entryDate) / (1000 * 60 * 60 * 24)).toInt() - 1
+                if (days > 0) {
+                    val key = "${record.country} - ${record.region}"
+                    stats[key] = (stats[key] ?: 0) + days
+                }
             }
             
             _uiState.value = _uiState.value.copy(stats = stats)
