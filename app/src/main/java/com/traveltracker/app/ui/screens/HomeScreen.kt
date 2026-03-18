@@ -23,6 +23,7 @@ import java.util.*
 fun HomeScreen(
     viewModel: TravelViewModel = hiltViewModel(),
     onNavigateToAdd: () -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
     onNavigateToStats: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,6 +76,7 @@ fun HomeScreen(
                     TravelRecordCard(
                         record = record,
                         dateFormat = dateFormat,
+                        onEdit = onEditRecord,
                         onDelete = { viewModel.deleteRecord(record) }
                     )
                 }
@@ -87,6 +89,7 @@ fun HomeScreen(
 fun TravelRecordCard(
     record: TravelRecord,
     dateFormat: SimpleDateFormat,
+    onEdit: (Long) -> Unit,
     onDelete: () -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -111,8 +114,13 @@ fun TravelRecordCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                TextButton(onClick = { showDeleteDialog = true }) {
-                    Text("Delete")
+                Row {
+                    TextButton(onClick = { onEdit(record.id) }) {
+                        Text("Edit")
+                    }
+                    TextButton(onClick = { showDeleteDialog = true }) {
+                        Text("Delete")
+                    }
                 }
             }
             Text(

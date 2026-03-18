@@ -15,6 +15,9 @@ interface TravelRecordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecord(record: TravelRecord): Long
 
+    @Update
+    suspend fun updateRecord(record: TravelRecord)
+
     @Delete
     suspend fun deleteRecord(record: TravelRecord)
 

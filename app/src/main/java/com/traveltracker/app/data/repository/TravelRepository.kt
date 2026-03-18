@@ -17,6 +17,10 @@ class TravelRepository @Inject constructor(
         return travelRecordDao.insertRecord(record)
     }
 
+    suspend fun updateRecord(record: TravelRecord) {
+        travelRecordDao.updateRecord(record)
+    }
+
     suspend fun deleteRecord(record: TravelRecord) {
         travelRecordDao.deleteRecord(record)
     }

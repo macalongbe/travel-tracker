@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.traveltracker.app.data.local.TravelRecord
 import com.traveltracker.app.ui.viewmodel.TravelViewModel
 import java.text.SimpleDateFormat
@@ -22,24 +21,28 @@ import java.util.*
 @Composable
 fun AddRecordScreen(
     viewModel: TravelViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    existingRecord: TravelRecord? = null
 ) {
-    var country by remember { mutableStateOf("") }
-    var region by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-    var entryDate by remember { mutableStateOf(System.currentTimeMillis()) }
-    var exitDate by remember { mutableStateOf(System.currentTimeMillis()) }
+    val isEditMode = existingRecord != null
+    
+    var country by remember { mutableStateOf(existingRecord?.country ?: "") }
+    var region by remember { mutableStateOf(existingRecord?.region ?: "") }
+    var notes by remember { mutableStateOf(existingRecord?.notes ?: "") }
+    var entryDate by remember { mutableStateOf(existingRecord?.entryDate ?: System.currentTimeMillis()) }
+    var exitDate by remember { mutableStateOf(existingRecord?.exitDate ?: System.currentTimeMillis()) }
     
     var showEntryDatePicker by remember { mutableStateOf(false) }
     var showExitDatePicker by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Travel Record") },
+                title = { Text(if (isEditMode) "Edit Travel Record" else "Add Travel Record") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -81,7 +84,7 @@ fun AddRecordScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Entry Date")
+                Text("Entry Date (Arrival)")
                 Text(
                     text = dateFormat.format(Date(entryDate)),
                     color = MaterialTheme.colorScheme.primary
@@ -97,7 +100,7 @@ fun AddRecordScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Exit Date")
+                Text("Exit Date (Departure)")
                 Text(
                     text = dateFormat.format(Date(exitDate)),
                     color = MaterialTheme.colorScheme.primary
@@ -115,7 +118,7 @@ fun AddRecordScreen(
 
             if (showError) {
                 Text(
-                    text = "Please fill in Country and Region",
+                    text = errorMessage,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -123,23 +126,37 @@ fun AddRecordScreen(
 
             Button(
                 onClick = {
+                    // Validation
                     if (country.isBlank() || region.isBlank()) {
                         showError = true
+                        errorMessage = "Please fill in Country and Region"
                         return@Button
                     }
+                    if (exitDate < entryDate) {
+                        showError = true
+                        errorMessage = "Exit date cannot be before arrival date"
+                        return@Button
+                    }
+                    
                     val record = TravelRecord(
+                        id = existingRecord?.id ?: 0,
                         country = country,
                         region = region,
                         entryDate = entryDate,
                         exitDate = exitDate,
                         notes = notes.ifBlank { null }
                     )
-                    viewModel.addRecord(record)
+                    
+                    if (isEditMode) {
+                        viewModel.updateRecord(record)
+                    } else {
+                        viewModel.addRecord(record)
+                    }
                     onNavigateBack()
                 },
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("Save Record")
+                Text(if (isEditMode) "Update Record" else "Save Record")
             }
         }
 
@@ -151,7 +168,13 @@ fun AddRecordScreen(
                 onDismissRequest = { showEntryDatePicker = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { entryDate = it }
+                        datePickerState.selectedDateMillis?.let { 
+                            entryDate = it
+                            // Auto-adjust exit date if needed
+                            if (exitDate < entryDate) {
+                                exitDate = it
+                            }
+                        }
                         showEntryDatePicker = false
                     }) {
                         Text("OK")
@@ -175,7 +198,9 @@ fun AddRecordScreen(
                 onDismissRequest = { showExitDatePicker = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { exitDate = it }
+                        datePickerState.selectedDateMillis?.let { 
+                            exitDate = it 
+                        }
                         showExitDatePicker = false
                     }) {
                         Text("OK")

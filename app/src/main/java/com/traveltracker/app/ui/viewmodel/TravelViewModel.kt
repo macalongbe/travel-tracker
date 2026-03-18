@@ -55,6 +55,16 @@ class TravelViewModel @Inject constructor(
         }
     }
 
+    fun updateRecord(record: TravelRecord) {
+        viewModelScope.launch {
+            try {
+                repository.updateRecord(record)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+
     fun deleteRecord(record: TravelRecord) {
         viewModelScope.launch {
             try {
