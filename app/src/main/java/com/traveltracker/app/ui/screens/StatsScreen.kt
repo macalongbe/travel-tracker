@@ -140,7 +140,7 @@ fun StatsScreen(
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
-                                    text = "${sortedStats.values.sum()} days",
+                                    text = "${sortedStats.sumOf { it.value }} days",
                                     style = MaterialTheme.typography.titleLarge,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
