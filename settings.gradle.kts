@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "travel-tracker"
-include ':app'
+include(":app")
